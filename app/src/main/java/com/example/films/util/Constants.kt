@@ -9,5 +9,6 @@ class Constants {
         const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
         const val REQUEST_KEY = "request_key"
         const val BUNDLE_KEY = "bundle_key"
+        const val ITEM_KEY = "item_key"
     }
 }

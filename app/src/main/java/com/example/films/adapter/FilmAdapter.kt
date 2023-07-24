@@ -40,6 +40,7 @@ class FilmAdapter(
 
         fun bind(item: FilmItem) {
             binding.txtMainName.text = item.title
+            binding.imgMain.loadImage(item.posterPath)
             binding.imageView.setOnClickListener {
                 currentList[bindingAdapterPosition].isFav= item.isFav?.not()
                 notifyItemChanged(bindingAdapterPosition)
@@ -47,12 +48,12 @@ class FilmAdapter(
             }
             setFavImage(item)
             binding.imageView
-            binding.imgMain.loadImage(item.posterPath)
+
 
 
         }
 
-        private fun setFavImage(item: FilmItem) {
+         fun setFavImage(item: FilmItem) {
             if (item.isFav == true) {
                 binding.imageView.setImageResource(R.drawable.favheart)
 

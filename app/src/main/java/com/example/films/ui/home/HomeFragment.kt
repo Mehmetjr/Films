@@ -2,6 +2,7 @@ package com.example.films.ui.home
 
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import com.example.films.R
 import com.example.films.adapter.FilmAdapter
 import com.example.films.databinding.FragmentHomeBinding
 import com.example.films.models.Film
+import com.example.films.models.FilmItem
 import com.example.films.network.Resource
 import com.example.films.ui.baseclass.BaseFragment
 import com.example.films.util.Constants
@@ -34,7 +36,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     private val binding by viewBinding(FragmentHomeBinding::bind)
     private var checker: Boolean = true
     private val adapter by lazy {
-        FilmAdapter( {
+        FilmAdapter({
 
             it?.let {
                 val action =
@@ -45,12 +47,12 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
         },
             {
                 if (it.isFav == true) {
-                    it.id?.let {id->
+                    it.id?.let { id ->
                         favoriteList.add(id.toDouble())
                         sharedPref.saveOrDelete("Fav", favoriteList)
                     }
                 } else {
-                    it.id?.let {id->
+                    it.id?.let { id ->
                         favoriteList.remove(id.toDouble())
                         sharedPref.saveOrDelete("Fav", favoriteList)
                     }
@@ -65,28 +67,31 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     }
 
 
-
     private val viewModel by viewModel<HomeViewModel>()
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeEvents()
 
-        parentFragmentManager.setFragmentResultListener(Constants.REQUEST_KEY,this,
+        parentFragmentManager.setFragmentResultListener(Constants.REQUEST_KEY, this,
             FragmentResultListener { requestKey, result ->
-                val listener : Boolean = result.getBoolean(Constants.BUNDLE_KEY)
-                val itemId = result.getInt(Constants.BUNDLE_KEY)
-
-                var value =adapter.currentList
-                val item =value.find {
+                val listener: Boolean = result.getBoolean(Constants.BUNDLE_KEY)
+                val itemId: Int = result.getInt(Constants.ITEM_KEY)
+                var value = adapter.currentList
+                val item = value.find {
                     it.id == itemId
                 }
                 item?.isFav = listener
+                if (item?.isFav == true) {
+                    favoriteList.add(itemId.toDouble())
+                } else {
+                    favoriteList.remove(itemId.toDouble())
+                }
 
-            }
-        )
+
+
+            })
 
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -111,21 +116,20 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     }
 
 
-
     private fun observeEvents() {
 
         viewModel.getFilmListState().observe(viewLifecycleOwner) {
 
             if (it.isStatusSuccess) {
-                val data =  it.data?.filmItems
-                data?.forEachIndexed{i,item->
-                   if (favoriteList.contains(item.id?.toDouble())) {
-                     item.isFav = true
-                       data[i]=item
+                val data = it.data?.filmItems
+                data?.forEachIndexed { i, item ->
+                    if (favoriteList.contains(item.id?.toDouble())) {
+                        item.isFav = true
+                        data[i] = item
 
-                   }else{
-                       item.isFav = false
-                   }
+                    } else {
+                        item.isFav = false
+                    }
                 }
                 adapter.submitList(data)
 

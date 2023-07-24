@@ -2,6 +2,7 @@ package com.example.films.ui.detail
 
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import com.example.films.R
@@ -36,7 +37,7 @@ class DetailFragment : BaseFragment(R.layout.fragment_detail) {
 
     }
 
-    private fun listeners() {
+   private fun listeners() {
         binding.apply {
             imgFav.setOnClickListener {
 
@@ -59,7 +60,7 @@ class DetailFragment : BaseFragment(R.layout.fragment_detail) {
                 val input = currentItem?.isFav
                 val bundle = Bundle()
                 currentItem?.id?.let {
-                    bundle.putInt(Constants.BUNDLE_KEY, it)
+                    bundle.putInt(Constants.ITEM_KEY, it)
                     if (input != null) {
                         bundle.putBoolean(Constants.BUNDLE_KEY, input)
                     }
